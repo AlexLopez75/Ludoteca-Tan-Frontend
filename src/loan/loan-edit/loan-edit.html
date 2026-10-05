@@ -1,0 +1,44 @@
+<div class="container">
+    @if (id()) {
+    <h1>Modificar préstamo</h1>
+    } @else {
+    <h1>Crear préstamo</h1>
+    }
+
+    <form>
+        <mat-form-field>
+            <mat-label>Identificador</mat-label>
+            <input type="text" matInput placeholder="Identificador" [(ngModel)]="id" name="id" disabled>
+        </mat-form-field>
+
+        <mat-form-field>
+            <mat-label>Cliente</mat-label>
+            <input type="text" matInput placeholder="Cliente" [(ngModel)]="clientName" name="clientName" required>
+            <mat-error>El cliente no puede estar vacío</mat-error>
+        </mat-form-field>
+
+        <mat-form-field>
+            <mat-label>Juego</mat-label>
+            <input type="text" matInput placeholder="Juego" [(ngModel)]="gameName" name="gameName" required>
+            <mat-error>El juego no puede estar vacío</mat-error>
+        </mat-form-field>
+
+        <mat-form-field>
+            <mat-label>Fecha de inicio</mat-label>
+            <input type="text" matInput placeholder="Inicio" [(ngModel)]="startDate" name="startDate" required>
+            <mat-error>La fecha no puede estar vacía</mat-error>
+        </mat-form-field>
+
+        <mat-form-field>
+            <mat-label>Fecha de finalización</mat-label>
+            <input type="text" matInput placeholder="Final" [(ngModel)]="endDate" name="endDate" required>
+            <mat-error>La fecha no puede estar vacía</mat-error>
+        </mat-form-field>
+
+    </form>
+
+    <div class="buttons">
+        <button mat-stroked-button (click)="onClose()">Cerrar</button>
+        <button mat-flat-button color="primary" (click)="onSave()">Guardar</button>
+    </div>
+</div>
