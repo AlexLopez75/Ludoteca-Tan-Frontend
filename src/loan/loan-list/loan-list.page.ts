@@ -11,57 +11,118 @@ import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatIconModule } from '@angular/material/icon';
+import { signal } from '@angular/core';
+import { Game } from '../../game/model/game'
+import { Clients } from '../../clients/model/clients'
+import { GameService } from '../../game/game-list/game.service';
+import { ClientsService } from '../../clients/clients-list/clients.service';
+import { FormsModule } from '@angular/forms';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatSelectModule } from '@angular/material/select';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatInputModule } from '@angular/material/input';
+import { MatNativeDateModule } from '@angular/material/core';
 
 @Component({
     selector: 'app-loan-list',
     standalone: true,
     imports: [
       CommonModule,
+      FormsModule,
       MatButtonModule,
       MatIconModule,
       MatTableModule,
-      MatPaginatorModule
+      MatPaginatorModule,
+      MatFormFieldModule,
+      MatSelectModule,
+      MatDatepickerModule,
+      MatInputModule,
+      MatNativeDateModule
     ],
     templateUrl: './loan-list.page.html',
     styleUrl: './loan-list.page.scss',
 })
 export class LoanListComponent implements OnInit {
+
     pageNumber: number = 0;
     pageSize: number = 5;
     totalElements: number = 0;
 
-    dataSource = new MatTableDataSource<Loan>();
-    displayedColumns: string[] = ['id', 'gameName', 'clientName', 'startDate', 'endDate', 'action'];
+    filterLoan: Loan = {};
+    protected readonly games = signal<Game[]>([]);
+    protected readonly clients = signal<Clients[]>([]);
 
-    constructor(private loanService: LoanService, public dialog: MatDialog) {}
+    dataSource = new MatTableDataSource<Loan>();
+    displayedColumns: string[] = [
+        'id',
+        'gameName',
+        'clientName',
+        'startDate',
+        'endDate',
+        'action'
+    ];
+
+    constructor(
+        private loanService: LoanService,
+       private gameService: GameService,
+        private clientsService: ClientsService,
+        public dialog: MatDialog
+    ) {}
 
     ngOnInit(): void {
+        this.loadGames();
+        this.loadClients();
         this.loadPage();
     }
 
     loadPage(event?: PageEvent) {
+
         const pageable: Pageable = {
             pageNumber: this.pageNumber,
             pageSize: this.pageSize,
             sort: [
                 {
                     property: 'id',
-                    direction: 'ASC',
-                },
-            ],
+                    direction: 'ASC'
+                }
+            ]
         };
 
-        if (event != null) {
-            pageable.pageSize = event.pageSize;
+        if (event) {
             pageable.pageNumber = event.pageIndex;
+            pageable.pageSize = event.pageSize;
         }
 
-        this.loanService.getLoans(pageable).subscribe((data) => {
-            this.dataSource.data = data.content;
-            this.pageNumber = data.pageable.pageNumber;
-            this.pageSize = data.pageable.pageSize;
-            this.totalElements = data.totalElements;
-        });
+        this.loanService.getLoans(this.filterLoan, pageable)
+            .subscribe(data => {
+                this.dataSource.data = data.content;
+                this.pageNumber = data.pageable.pageNumber;
+                this.pageSize = data.pageable.pageSize;
+                this.totalElements = data.totalElements;
+            });
+    }
+
+    onSearch() {
+        this.pageNumber = 0;
+        this.loadPage();
+    }
+
+    onCleanFilter() {
+        this.filterLoan = {};
+        this.pageNumber = 0;
+        this.loadPage();
+    }
+
+    loadGames(): void {
+        this.gameService.getGames().subscribe(data => {
+        this.games.set(data);
+      });
+    }
+
+    loadClients(): void {
+      this.clientsService.getClients().subscribe(data => {
+          this.clients.set(data);
+      });
     }
 
     createLoan() {

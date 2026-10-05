@@ -1,7 +1,14 @@
 export interface Loan {
-    id: number;
-    clientName: string;
-    gameName: string;
-    startDate: Date;
-    endDate: Date;
+
+    id?: number;
+    gameId?: number;
+    gameName?: string;
+
+    clientId?: number;
+    clientName?: string;
+
+    startDate?: Date;
+    endDate?: Date;
+
+    searchDate?: Date;
 }
