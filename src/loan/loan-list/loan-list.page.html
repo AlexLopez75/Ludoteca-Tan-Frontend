@@ -33,12 +33,12 @@
                 </mat-datepicker-toggle>
                 <mat-datepicker #picker></mat-datepicker>
             </mat-form-field>
-        </form>
 
-        <div class="buttons">
-            <button mat-stroked-button (click)="onCleanFilter()">Limpiar</button>
-            <button mat-stroked-button (click)="onSearch()">Filtrar</button>
-        </div>
+            <div class="buttons">
+                <button mat-stroked-button (click)="onCleanFilter()">Limpiar</button>
+                <button mat-flat-button color="primary" (click)="onSearch()">Filtrar</button>
+            </div>
+        </form>
     </div>
 
     <mat-table [dataSource]="dataSource"> 

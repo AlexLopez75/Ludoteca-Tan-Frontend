@@ -8,6 +8,13 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { validateFields } from '../../core/helpers/validation.helper';
 import { MatDialogModule } from '@angular/material/dialog';
+import { Clients } from '../../clients/model/clients';
+import { Game } from '../../game/model/game';
+import { ClientsService } from '../../clients/clients-list/clients.service';
+import { GameService } from '../../game/game-list/game.service';
+import { MatSelectModule } from '@angular/material/select';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
 
 @Component({
     selector: 'app-loan-edit',
@@ -18,7 +25,10 @@ import { MatDialogModule } from '@angular/material/dialog';
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,
-    MatDialogModule
+    MatDialogModule,
+    MatSelectModule,
+    MatDatepickerModule,
+    MatNativeDateModule
     ],
     templateUrl: './loan-edit.html',
     styleUrl: './loan-edit.scss',
@@ -28,35 +38,54 @@ export class LoanEditComponent implements OnInit {
     protected readonly dialogRef = inject(MatDialogRef<LoanEditComponent>);
     protected readonly data = inject(MAT_DIALOG_DATA);
 
+    protected readonly clientsService = inject(ClientsService);
+    protected readonly gameService = inject(GameService);
+
     protected readonly id = signal<number | null>(null);
+    protected readonly clientId = signal<number | null>(null);
+    protected readonly gameId = signal<number | null>(null);
     protected readonly clientName = signal<string | null>(null);
     protected readonly gameName = signal<string | null>(null);
     protected readonly startDate = signal<Date | null>(null);
     protected readonly endDate = signal<Date | null>(null);
 
+            
+    clients: Clients[] = [];
+    games: Game[] = [];
 
     loadFormData(initialData: Loan | null) {
-        this.id.set(initialData.id ?? null);
-        this.clientName.set(initialData.clientName ?? null);
-        this.gameName.set(initialData.gameName ?? null);
-        this.startDate.set(initialData.startDate ?? null);
-        this.endDate.set(initialData.endDate ?? null);
-
+        this.id.set(initialData?.id ?? null);
+        this.clientId.set(initialData?.clientId ?? null);
+        this.gameId.set(initialData?.gameId ?? null);
+        this.clientName.set(initialData?.clientName ?? null);
+        this.gameName.set(initialData?.gameName ?? null);
+        this.startDate.set(initialData?.startDate ?? null);
+        this.endDate.set(initialData?.endDate ?? null);
     }
 
     ngOnInit(): void {
+
         this.loadFormData(this.data.loan ?? null);
+
+        this.clientsService.getClients().subscribe(data => {
+            console.log('CLIENTS', data);
+            this.clients = data;
+        });
+
+        this.gameService.getGames().subscribe(data => {
+            this.games = data;
+        });
     }
 
     onSave() {
         const id = this.id();
-        const clientName = this.clientName();
-        const gameName = this.gameName();
+        const clientId = this.clientId();
+        const gameId = this.gameId();
         const startDate = this.startDate();
         const endDate = this.endDate();
 
-        const requiredFields = ["clientName", "gameName", "startDate", "endDate"] as const
-        const data = { clientName, gameName, startDate, endDate }
+        const requiredFields = ["clientId", "gameId", "startDate", "endDate"] as const
+        const data = { clientId, gameId, startDate, endDate }
 
         if (!validateFields(data, requiredFields)) {
             return;
@@ -64,8 +93,8 @@ export class LoanEditComponent implements OnInit {
 
         const loan = {
             id,
-            clientName,
-            gameName,
+            clientId,
+            gameId,
             startDate,
             endDate,
         } as Loan;

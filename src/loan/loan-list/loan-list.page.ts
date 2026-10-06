@@ -148,9 +148,9 @@ export class LoanListComponent implements OnInit {
     deleteLoan(loan: Loan) {
         const dialogRef = this.dialog.open(DialogConfirmationComponent, {
             data: {
-                title: 'Eliminar autor',
+                title: 'Eliminar préstamo',
                 description:
-                    'Atención si borra el autor se perderán sus datos.<br> ¿Desea eliminar el autor?',
+                    'Atención si borra el préstamo se perderán sus datos.<br> ¿Desea eliminar el préstamo?',
             },
         });
 
