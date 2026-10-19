@@ -13,24 +13,44 @@
 
         <mat-form-field>
             <mat-label>Cliente</mat-label>
-            <mat-select [(ngModel)]="clientId" name="clientId">
+            <mat-select [(ngModel)]="clientId" #clientModel="ngModel" name="clientId" required>
                 @for (client of clients; track client.id) {
                     <mat-option [value]="client.id">
                         {{ client.name }}
                     </mat-option>
                 }
             </mat-select>
+            @if (clientModel.hasError('required')) {
+                <mat-error>
+                    El cliente no puede estar vacío
+                </mat-error>
+            }
+            @if (clientModel.hasError('moreThanTwoLoans')) {
+            <mat-error>
+                El cliente ya tiene 2 préstamos activos
+            </mat-error>
+            }
         </mat-form-field>
 
         <mat-form-field>
             <mat-label>Juego</mat-label>
-            <mat-select [(ngModel)]="gameId" name="gameId">
+            <mat-select [(ngModel)]="gameId" #gameModel="ngModel" name="gameId" required>
                 @for (game of games; track game.id) {
                     <mat-option [value]="game.id">
                         {{ game.title }}
                     </mat-option>
                 }
             </mat-select>
+            @if (gameModel.hasError('required')) {
+                <mat-error>
+                    El juego no puede estar vacío
+                </mat-error>
+            }
+            @if (gameModel.hasError('alreadyLoaned')) {
+                <mat-error>
+                    No se puede prestar un juego ya prestado
+                </mat-error>
+            }
         </mat-form-field>
 
         <mat-form-field>
@@ -39,12 +59,18 @@
                 matInput
                 [matDatepicker]="startPicker"
                 [ngModel]="startDate()"
+                #startDateModel="ngModel"
                 (ngModelChange)="startDate.set($event)"
-                name="startDate">
+                name="startDate" required>
 
             <mat-datepicker-toggle matIconSuffix [for]="startPicker">
             </mat-datepicker-toggle>
             <mat-datepicker #startPicker></mat-datepicker>
+            @if (startDateModel.hasError('required')) {
+                <mat-error>
+                    La fecha no puede estar vacía
+                </mat-error>
+            }
         </mat-form-field>
 
         <mat-form-field>
@@ -53,14 +79,30 @@
                 matInput
                 [matDatepicker]="endPicker"
                 [ngModel]="endDate()"
+                #endDateModel="ngModel"
                 (ngModelChange)="endDate.set($event)"
-                name="endDate">
+                name="endDate" required>
 
             <mat-datepicker-toggle matIconSuffix [for]="endPicker">
             </mat-datepicker-toggle>
             <mat-datepicker #endPicker></mat-datepicker>
-        </mat-form-field>
+            @if (endDateModel.hasError('required')) {
+                <mat-error>
+                    La fecha no puede estar vacía
+                </mat-error>
+            }
+            @if (endDateModel.hasError('endBeforeStart')) {
+            <mat-error>
+                La fecha fin debe ser posterior a la fecha inicio
+            </mat-error>
+            }
 
+            @if (endDateModel.hasError('tooManyDays')) {
+            <mat-error>
+                El préstamo no puede superar los 14 días
+            </mat-error>
+            }
+        </mat-form-field>
     </form>
 
     <div class="buttons">

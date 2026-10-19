@@ -1,4 +1,5 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, ViewChild } from '@angular/core';
+import { NgModel } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { ClientsService } from '../clients-list/clients.service';
 import { Clients } from '../model/clients';
@@ -20,10 +21,11 @@ export class ClientsEditComponent implements OnInit {
     protected readonly data = inject(MAT_DIALOG_DATA) as { client: Clients };
     protected readonly clientsService = inject(ClientsService);
 
+    @ViewChild('nameModel') nameModel!: NgModel;
+
     protected readonly id = signal<number | null>(null);
     protected readonly name = signal<string | null>(null);
-    protected readonly duplicatedName = signal(false);
-
+    
     ngOnInit(): void {
         this.loadFormData(this.data.client ?? null);
     }
@@ -43,8 +45,6 @@ export class ClientsEditComponent implements OnInit {
 
         const client = { id, name } as Clients;
         
-        this.duplicatedName.set(false);
-
         this.clientsService.saveClient(client).subscribe({ 
           next: () => {
             console.log('NEXT');
@@ -52,8 +52,9 @@ export class ClientsEditComponent implements OnInit {
           },
           error: (err) => {
             console.log('ERROR', err);
-            this.duplicatedName.set(true);
-          }
+            this.nameModel.control.setErrors({
+                duplicated: true
+            });          }
         });
     }
 
@@ -63,6 +64,8 @@ export class ClientsEditComponent implements OnInit {
 
     onNameChange(value: string) {
         this.name.set(value);
-        this.duplicatedName.set(false);
+        if (this.nameModel?.hasError('duplicated')) {
+            this.nameModel.control.setErrors(null);
+        }    
     }
 }

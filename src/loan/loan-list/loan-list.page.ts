@@ -64,7 +64,7 @@ export class LoanListComponent implements OnInit {
 
     constructor(
         private loanService: LoanService,
-       private gameService: GameService,
+        private gameService: GameService,
         private clientsService: ClientsService,
         public dialog: MatDialog
     ) {}

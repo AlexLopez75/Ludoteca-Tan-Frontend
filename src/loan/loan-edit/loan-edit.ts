@@ -1,4 +1,5 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, ViewChild } from '@angular/core';
+import { NgModel } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { LoanService } from '../loan-list/loan.service';
 import { Loan } from '../model/loan';
@@ -37,6 +38,10 @@ export class LoanEditComponent implements OnInit {
     protected readonly loanService = inject(LoanService);
     protected readonly dialogRef = inject(MatDialogRef<LoanEditComponent>);
     protected readonly data = inject(MAT_DIALOG_DATA);
+    
+    @ViewChild('clientModel') clientModel!: NgModel;
+    @ViewChild('gameModel') gameModel!: NgModel;
+    @ViewChild('endDateModel') endDateModel!: NgModel;
 
     protected readonly clientsService = inject(ClientsService);
     protected readonly gameService = inject(GameService);
@@ -48,8 +53,7 @@ export class LoanEditComponent implements OnInit {
     protected readonly gameName = signal<string | null>(null);
     protected readonly startDate = signal<Date | null>(null);
     protected readonly endDate = signal<Date | null>(null);
-
-            
+      
     clients: Clients[] = [];
     games: Game[] = [];
 
@@ -98,8 +102,33 @@ export class LoanEditComponent implements OnInit {
             startDate,
             endDate,
         } as Loan;
-        this.loanService.saveLoan(loan).subscribe(() => {
+        
+        this.loanService.saveLoan(loan).subscribe({
+            next: () => {
             this.dialogRef.close(true);
+            },
+            error: (err) =>{
+                console.log('ERROR COMPLETO', err);
+                console.log('CODE', err.error?.code);
+                
+                switch (err.error.code) {
+                    case 'END_BEFORE_START':
+                        this.endDateModel.control.setErrors({ endBeforeStart: true });
+                    break;
+
+                    case 'TOO_MANY_DAYS':
+                        this.endDateModel.control.setErrors({ tooManyDays: true });
+                    break;
+
+                    case 'MORE_THAN_TWO_LOANS':
+                        this.clientModel.control.setErrors({ moreThanTwoLoans: true });
+                    break;
+
+                    case 'ALREADY_LOANED':
+                        this.gameModel.control.setErrors({ alreadyLoaned: true });
+                    break;
+                }
+            }
         });
     }
 

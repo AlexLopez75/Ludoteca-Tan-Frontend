@@ -13,14 +13,17 @@
 
         <mat-form-field>
             <mat-label>Nombre</mat-label>
-            <input type="text" matInput placeholder="Nombre del cliente" [(ngModel)]="name" (ngModelChange)="onNameChange($event)" name="name" required>
-            @if (!name()) {
-            <mat-error>El nombre no puede estar vacío</mat-error>
+            <input type="text" matInput placeholder="Nombre del cliente" [(ngModel)]="name" (ngModelChange)="onNameChange($event)" #nameModel="ngModel" name="name" required>
+            @if (nameModel.hasError('required')) {
+                <mat-error>
+                    El nombre no puede estar vacío
+                </mat-error>
+            }  
+            @if (nameModel.hasError('duplicated')) {
+                <mat-error>
+                    El nombre ya existe
+                </mat-error>
             }
-            @if (duplicatedName()) {
-            <div class="error-message">
-                El nombre ya existe
-            </div>            }
         </mat-form-field>
     </form>
 
