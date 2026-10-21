@@ -59,12 +59,12 @@
 
         <ng-container matColumnDef="startDate">
             <mat-header-cell *matHeaderCellDef> Fecha de inicio </mat-header-cell>
-            <mat-cell *matCellDef="let element"> {{element.startDate}} </mat-cell>
+            <mat-cell *matCellDef="let element"> {{element.startDate | date:'dd-MM-yyyy'}} </mat-cell>
         </ng-container>
 
         <ng-container matColumnDef="endDate">
             <mat-header-cell *matHeaderCellDef> Fecha de finalización </mat-header-cell>
-            <mat-cell *matCellDef="let element"> {{element.endDate}} </mat-cell>
+            <mat-cell *matCellDef="let element"> {{element.endDate | date:'dd-MM-yyyy'}} </mat-cell>
         </ng-container>
 
         <ng-container matColumnDef="action">

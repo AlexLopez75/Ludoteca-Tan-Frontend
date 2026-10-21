@@ -3,6 +3,7 @@ import { NgModel } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { LoanService } from '../loan-list/loan.service';
 import { Loan } from '../model/loan';
+import { LoanSaveDto } from '../model/loanSaveDto';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -63,8 +64,8 @@ export class LoanEditComponent implements OnInit {
         this.gameId.set(initialData?.gameId ?? null);
         this.clientName.set(initialData?.clientName ?? null);
         this.gameName.set(initialData?.gameName ?? null);
-        this.startDate.set(initialData?.startDate ?? null);
-        this.endDate.set(initialData?.endDate ?? null);
+        this.startDate.set(initialData?.startDate ? new Date(initialData.startDate) : null);
+        this.endDate.set(initialData?.endDate ? new Date(initialData.endDate) : null);
     }
 
     ngOnInit(): void {
@@ -81,6 +82,14 @@ export class LoanEditComponent implements OnInit {
         });
     }
 
+    formatLocalDate(date: Date): string {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+
+        return `${year}-${month}-${day}`;
+    }
+    
     onSave() {
         const id = this.id();
         const clientId = this.clientId();
@@ -95,14 +104,22 @@ export class LoanEditComponent implements OnInit {
             return;
         }
 
-        const loan = {
+        const loan: LoanSaveDto = {
             id,
             clientId,
             gameId,
-            startDate,
-            endDate,
-        } as Loan;
+            startDate: this.formatLocalDate(startDate!),
+            endDate: this.formatLocalDate(endDate!)
+        };
         
+        console.log('StartDate object:', startDate);
+        console.log('StartDate ISO:', startDate?.toISOString());
+
+        console.log('EndDate object:', endDate);
+        console.log('EndDate ISO:', endDate?.toISOString());
+
+        console.log('Payload JSON:', JSON.stringify(loan));
+
         this.loanService.saveLoan(loan).subscribe({
             next: () => {
             this.dialogRef.close(true);

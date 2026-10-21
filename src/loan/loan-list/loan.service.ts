@@ -4,6 +4,7 @@ import { Pageable } from '../../core/model/Pageable';
 import { Loan } from '../model/loan';
 import { PaginatedData } from '../../core/model/PaginatedData';
 import { HttpClient } from '@angular/common/http';
+import { LoanSaveDto } from '../model/loanSaveDto';
 
 @Injectable({
     providedIn: 'root',
@@ -21,7 +22,7 @@ export class LoanService {
             pageable: pageable });
     }
 
-    saveLoan(Loan: Loan): Observable<Loan> {
+    saveLoan(Loan: LoanSaveDto): Observable<Loan> {
         const { id } = Loan;
         const url = id ? `${this.baseUrl}/${id}` : this.baseUrl;
         return this.http.put<Loan>(url, Loan);
